@@ -13,6 +13,7 @@ if(!localStorage.getItem(KEY))state.records=[];
 if(!state.startDate)state.startDate='2026-10-26';
 if(!state.height)state.height=170;
 if(!Array.isArray(state.fastingDays))state.fastingDays=[];
+state.stage=Number(state.stage)||1;$('#currentStage').textContent=`${state.stage}주차`;$('#decisionWeekChip').textContent=`${state.stage}주차`;
 const savedRecordCount=state.records.length;state.records=state.records.filter(r=>!(Number(r.weight)===0&&Number(r.muscle)===0&&Number(r.fat)===0));if(state.records.length!==savedRecordCount)persist();
 function syncFastingToggle(){const button=$('#toggleFastingDay');if(!button)return;const active=state.fastingDays.includes(fmt(state.selected));button.textContent=active?'단식일 지정 해제':'단식일로 지정';button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));}
 function fatMass(record){const percent=Number(record.fatPercent),weight=Number(record.weight);return record.fatPercent!==undefined&&Number.isFinite(percent)&&weight?Number((weight*percent/100).toFixed(1)):Number(record.fat)||0;}

@@ -27,7 +27,7 @@
             <span class="label">현재 진행 단계</span>
             <h2 id="currentStage">2주차</h2>
           </div>
-          <span class="status-badge" id="statusBadge">회복 중</span>
+          <div class="stage-actions"><button type="button" class="guide-link" id="openDietGuide">식단·지침 보기 ↗</button><span class="status-badge" id="statusBadge">회복 중</span></div>
         </div>
         <div class="progress-track"><span id="stageProgress"></span></div>
         <div class="hero-meta"><span id="stagePeriod">2026.11.02 – 2026.11.08</span><strong id="daysLeft">종료까지 6일</strong></div>
@@ -60,7 +60,7 @@
     </section>
 
     <section class="records-section"><div class="section-title"><div><span class="label">DAILY MEASUREMENTS</span><h2>날짜별 측정 기록</h2></div><span class="record-count" id="recordCount">0건</span></div><div class="records-table-wrap"><table><thead><tr><th>날짜</th><th>체중</th><th>BMI</th><th>근육량</th><th>체지방량</th></tr></thead><tbody id="recordsTable"></tbody></table><p class="empty-records" id="emptyRecords">아직 측정 기록이 없습니다.</p></div></section>
-    <section class="history-section"><div class="section-title"><div><span class="label">WEEKLY LOG</span><h2>주차별 진행 기록</h2></div><div class="history-actions"><button class="text-button" id="openDietGuide">주차별 식단·지침 보기</button><button class="text-button" id="resetData">데모 데이터 초기화</button></div></div><div id="history" class="history-list"></div></section>
+    <section class="history-section"><div class="section-title"><div><span class="label">WEEKLY LOG</span><h2>주차별 진행 기록</h2></div><div class="history-actions"><button class="text-button" id="resetData">데모 데이터 초기화</button></div></div><div id="history" class="history-list"></div></section>
   </main>
 
   <dialog id="recordDialog"><form method="dialog" id="recordForm"><div class="dialog-head"><div><span class="label">DAILY RECORD</span><h2>측정 기록 추가</h2></div><button value="cancel" class="close-button">×</button></div><p class="dialog-date" id="recordDate"></p><button type="button" class="fasting-toggle" id="toggleFastingDay" aria-pressed="false">단식일로 지정</button><div class="form-grid"><label>체중 (kg)<input required name="weight" type="number" step="0.01" placeholder="예: 68.45" /></label><label>근육량 (kg)<input required name="muscle" type="number" step="0.1" placeholder="예: 27.8" /></label><label>체지방량 (kg)<input required name="fat" type="number" step="0.1" placeholder="예: 18.2" /></label><label>컨디션<select name="condition"><option>좋음</option><option>보통</option><option>주의</option></select></label></div><label>메모<textarea name="note" rows="3" placeholder="오늘의 식단, 운동, 컨디션을 기록하세요."></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary-button">취소</button><button value="default" class="primary-button">저장하기</button></div></form></dialog>
