@@ -25,7 +25,7 @@
         <div class="hero-card-top">
           <div>
             <span class="label">현재 진행 단계</span>
-            <h2 id="currentStage">2주차 <small>· 3회차</small></h2>
+            <h2 id="currentStage">2주차</h2>
           </div>
           <span class="status-badge" id="statusBadge">회복 중</span>
         </div>
@@ -38,16 +38,16 @@
 
     <section class="content-grid">
       <article class="panel calendar-panel">
-        <div class="panel-heading"><div><span class="label">CALENDAR</span><h2 id="calendarTitle">2026년 11월</h2></div><div class="calendar-nav"><button id="prevMonth">‹</button><button id="nextMonth">›</button></div></div>
+        <div class="panel-heading"><div><span class="label">CALENDAR</span><h2 id="calendarTitle">2026년 11월</h2></div><div class="calendar-nav"><button id="goToday" class="today-button">오늘</button><button id="prevMonth">‹</button><button id="nextMonth">›</button></div></div>
         <div class="weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
         <div class="calendar" id="calendar"></div>
-        <div class="legend"><span><i class="dot current"></i>현재 주차</span><span><i class="dot measured"></i>측정 기록</span><span><i class="dot decision"></i>판정일</span></div>
+        <div class="legend"><span><i class="dot current"></i>현재 주차</span><span><i class="dot measured"></i>측정 기록</span><span><i class="dot decision"></i>판정일</span><span><i class="dot fasting-legend"></i>단식일</span></div>
       </article>
 
       <article class="panel decision-panel">
-        <div class="panel-heading"><div><span class="label">NEXT DECISION</span><h2>다음 주차 판정</h2></div><span class="week-chip">2주차 · 3회차</span></div>
+        <div class="panel-heading"><div><span class="label">NEXT DECISION</span><h2>다음 주차 판정</h2></div><span class="week-chip" id="decisionWeekChip">2주차</span></div>
         <div class="decision-result"><span class="decision-icon">↗</span><div><strong>2주차 회복 중</strong><p>근육량이 초기 기준에 접근하고 있습니다.</p></div></div>
-        <div class="check-list"><div><span class="check-icon done">✓</span><div><strong>체지방 감소 추세</strong><small>초기 대비 -1.4kg</small></div><b class="ok">충족</b></div><div><span class="check-icon progress">~</span><div><strong>근육량 회복</strong><small>초기 대비 -0.2kg · 기준 ±0.2kg</small></div><b class="wait">진행 중</b></div></div>
+        <div class="check-list"><div><span class="check-icon progress">~</span><div><strong>체지방 변화</strong><small>초기 기준 21.4kg과 최신 측정값 비교</small></div><b class="wait">측정 필요</b></div><div><span class="check-icon progress">~</span><div><strong>근육량 회복</strong><small>초기 기준 54.5kg까지 회복 중</small></div><b class="wait">미회복</b></div></div>
         <div class="decision-actions"><button class="secondary-button" id="repeatStage">현재 주차 반복</button><button class="primary-button" id="advanceStage">다음 주차 진행</button></div>
         <p class="hint">자동 권고는 참고용입니다. 신체 측정 결과와 컨디션을 함께 확인하세요.</p>
       </article>
@@ -56,14 +56,14 @@
     <section class="panel chart-panel">
       <div class="panel-heading chart-heading"><div><span class="label">BODY COMPOSITION</span><h2>초기 기준 대비 변화</h2></div><div class="chart-tabs"><button class="active" data-chart="muscle">근육량</button><button data-chart="fat">체지방</button><button data-chart="weight">체중</button></div></div>
       <div class="chart-wrap"><svg id="chart" viewBox="0 0 800 250" role="img" aria-label="신체 변화 그래프"></svg></div>
-      <div class="chart-caption"><span><i class="line-key muscle-key"></i>현재 측정값</span><span><i class="line-key baseline-key"></i>초기 기준선</span><span id="chartSummary">초기 대비 근육량 -0.2kg</span></div>
+      <div class="chart-caption"><span><i class="line-key muscle-key"></i>측정값</span><span><i class="line-key baseline-key"></i>초기 기준선</span><span><i class="line-key trend-key"></i>추세선</span><span id="chartSummary">초기 대비 근육량 -0.2kg</span></div>
     </section>
 
     <section class="records-section"><div class="section-title"><div><span class="label">DAILY MEASUREMENTS</span><h2>날짜별 측정 기록</h2></div><span class="record-count" id="recordCount">0건</span></div><div class="records-table-wrap"><table><thead><tr><th>날짜</th><th>체중</th><th>BMI</th><th>근육량</th><th>체지방량</th></tr></thead><tbody id="recordsTable"></tbody></table><p class="empty-records" id="emptyRecords">아직 측정 기록이 없습니다.</p></div></section>
     <section class="history-section"><div class="section-title"><div><span class="label">WEEKLY LOG</span><h2>주차별 진행 기록</h2></div><button class="text-button" id="resetData">데모 데이터 초기화</button></div><div id="history" class="history-list"></div></section>
   </main>
 
-  <dialog id="recordDialog"><form method="dialog" id="recordForm"><div class="dialog-head"><div><span class="label">DAILY RECORD</span><h2>측정 기록 추가</h2></div><button value="cancel" class="close-button">×</button></div><p class="dialog-date" id="recordDate"></p><div class="form-grid"><label>체중 (kg)<input required name="weight" type="number" step="0.1" placeholder="예: 68.4" /></label><label>근육량 (kg)<input required name="muscle" type="number" step="0.1" placeholder="예: 27.8" /></label><label>체지방량 (kg)<input required name="fat" type="number" step="0.1" placeholder="예: 18.2" /></label><label>컨디션<select name="condition"><option>좋음</option><option>보통</option><option>주의</option></select></label></div><label>메모<textarea name="note" rows="3" placeholder="오늘의 식단, 운동, 컨디션을 기록하세요."></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary-button">취소</button><button value="default" class="primary-button">저장하기</button></div></form></dialog>
+  <dialog id="recordDialog"><form method="dialog" id="recordForm"><div class="dialog-head"><div><span class="label">DAILY RECORD</span><h2>측정 기록 추가</h2></div><button value="cancel" class="close-button">×</button></div><p class="dialog-date" id="recordDate"></p><button type="button" class="fasting-toggle" id="toggleFastingDay" aria-pressed="false">단식일로 지정</button><div class="form-grid"><label>체중 (kg)<input required name="weight" type="number" step="0.1" placeholder="예: 68.4" /></label><label>근육량 (kg)<input required name="muscle" type="number" step="0.1" placeholder="예: 27.8" /></label><label>체지방량 (kg)<input required name="fat" type="number" step="0.1" placeholder="예: 18.2" /></label><label>컨디션<select name="condition"><option>좋음</option><option>보통</option><option>주의</option></select></label></div><label>메모<textarea name="note" rows="3" placeholder="오늘의 식단, 운동, 컨디션을 기록하세요."></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary-button">취소</button><button value="default" class="primary-button">저장하기</button></div></form></dialog>
   <dialog id="startDialog"><form method="dialog" id="startForm"><div class="dialog-head"><div><span class="label">PROGRAM SETUP</span><h2>다이어트 시작일</h2></div><button type="button" class="close-button" id="closeStart">×</button></div><p class="dialog-date">시작일을 기준으로 주차를 계산합니다.</p><label>시작일<input required id="startDateInput" type="date" /></label><div class="dialog-actions"><button type="button" class="secondary-button" id="cancelStart">취소</button><button value="default" class="primary-button">저장하기</button></div></form></dialog>
   <script src="app.js"></script>
 </body>
