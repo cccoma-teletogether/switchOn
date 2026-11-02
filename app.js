@@ -60,7 +60,7 @@ function renderDecision(){
   const empty=!state.records.length;
   ['.decision-result','.check-list','.decision-actions','.hint'].forEach(s=>document.querySelector('.decision-panel '+s).style.display=empty?'none':'');
   if(empty){$('#statusBadge').textContent='측정 필요';return}
-  const rows=state.records.slice().sort((a,b)=>a.date.localeCompare(b.date)),latest=rows.at(-1),recent=rows.slice(-3),averageMuscle=recent.reduce((sum,r)=>sum+Number(r.muscle),0)/recent.length,averageDelta=Number((averageMuscle-initial.muscle).toFixed(1)),trendDelta=recent.length===3?Number((Number(recent.at(-1).muscle)-Number(recent[0].muscle)).toFixed(1)):null,trend=trendDelta===null?'측정 부족':trendDelta>0.5?'상승':trendDelta<-.5?'하락':'기복 범위',inRecoveryBand=averageDelta>=-.5,fatCurrent=Number(fatMass(latest).toFixed(1)),fatDelta=Number((fatCurrent-initial.fat).toFixed(1)),remaining=Math.max(0,Number((initial.muscle-averageMuscle).toFixed(1)));
+  const rows=state.records.slice().sort((a,b)=>a.date.localeCompare(b.date)),latest=rows.at(-1),recent=rows.slice(-3),averageMuscle=recent.reduce((sum,r)=>sum+Number(r.muscle),0)/recent.length,averageDelta=Number((averageMuscle-initial.muscle).toFixed(1)),trendDelta=recent.length===3?Number((Number(recent.at(-1).muscle)-Number(recent[0].muscle)).toFixed(1)):null,trend=trendDelta===null?'측정 부족':trendDelta>0.5?'상승':trendDelta<-.5?'하락':'뚜렷한 방향 없음',inRecoveryBand=averageDelta>=-.5,fatCurrent=Number(fatMass(latest).toFixed(1)),fatDelta=Number((fatCurrent-initial.fat).toFixed(1)),remaining=Math.max(0,Number((initial.muscle-averageMuscle).toFixed(1)));
   $('#statusBadge').textContent=inRecoveryBand?'시작 기준 범위':trend==='상승'?'회복 추세':'초기 기준 아래';
   $('.check-list>div:nth-child(1) small').textContent=`현재 ${fatCurrent.toFixed(1)}kg · 초기 대비 ${fatDelta>0?'+':''}${fatDelta.toFixed(1)}kg`;
   const fatResult=$('.check-list>div:nth-child(1) b'),fatIcon=$('.check-list>div:nth-child(1) .check-icon');
@@ -70,13 +70,13 @@ function renderDecision(){
   muscleResult.textContent=inRecoveryBand?'회복 범위':'기준 미도달';muscleResult.classList.toggle('ok',inRecoveryBand);muscleResult.classList.toggle('wait',!inRecoveryBand);muscleIcon.textContent=inRecoveryBand?'✓':trend==='상승'?'↗':trend==='하락'?'↓':'~';muscleIcon.classList.toggle('done',inRecoveryBand);muscleIcon.classList.toggle('progress',!inRecoveryBand);
   const heading=$('.decision-result strong'),detail=$('.decision-result p');
   if(state.stage===2){
-    if(recent.length<3){heading.textContent='추세 판정에 기록이 더 필요합니다';detail.textContent=`현재 초기 기준보다 ${remaining.toFixed(1)}kg 낮습니다. 최근 측정 3회가 쌓이면 기복을 줄여 추세를 확인할 수 있습니다.`}
+    if(recent.length<3){heading.textContent='추세 판정에 기록이 더 필요합니다';detail.textContent=`현재 초기 기준보다 ${remaining.toFixed(1)}kg 낮습니다. 최근 측정 3회가 쌓이면 흐름을 비교할 수 있습니다.`}
     else if(inRecoveryBand&&trend==='하락'){heading.textContent='시작 기준 범위지만 최근 감소 추세입니다';detail.textContent='근육량 평균은 시작 기준 범위에 있지만 최근 3회 방향이 내려가고 있습니다. 체지방 추세와 함께 한 번 더 확인하세요.'}
     else if(inRecoveryBand&&fatDelta<0){heading.textContent='3주차 진행 조건을 검토할 수 있습니다';detail.textContent='최근 3회 근육량 평균이 시작 기준 ±0.5kg 범위이고 최근 하락 추세가 없으며 체지방도 초기보다 감소했습니다.'}
     else if(inRecoveryBand){heading.textContent='근육량은 시작 기준 범위입니다';detail.textContent='근육량 증가가 필수는 아닙니다. 체지방 감소 여부와 전체 측정 추세도 함께 확인하세요.'}
     else if(trend==='상승'){heading.textContent='회복 추세지만 시작 기준에는 아직 못 미칩니다';detail.textContent=`최근 3회는 상승했지만 평균은 시작 기준보다 ${remaining.toFixed(1)}kg 낮습니다. 2주차 패턴을 유지하며 같은 조건으로 다시 측정하세요.`}
     else if(trend==='하락'){heading.textContent='최근 근육량이 감소하는 추세입니다';detail.textContent=`최근 3회가 하락했고 평균은 시작 기준보다 ${remaining.toFixed(1)}kg 낮습니다. 단백질·근력운동·수면을 점검하고 2주차를 더 유지하세요.`}
-    else{heading.textContent='초기 기준보다 낮고 추세는 기복 범위입니다';detail.textContent=`최근 3회 변화가 ±0.5kg 안에 있어 상승·하락을 뚜렷하게 구분하기 어렵습니다. 평균 ${averageMuscle.toFixed(1)}kg은 시작 기준보다 ${remaining.toFixed(1)}kg 낮아 회복 완료로 보긴 어렵습니다.`}
+    else{heading.textContent='초기 기준보다 낮고 뚜렷한 방향은 없습니다';detail.textContent=`최근 3회 첫 값과 마지막 값의 차이가 ±0.5kg 안이라 뚜렷한 상승·하락으로 보기 어렵습니다. 평균 ${averageMuscle.toFixed(1)}kg은 시작 기준보다 ${remaining.toFixed(1)}kg 낮아 회복 범위에는 아직 들지 않습니다.`}
   }else{heading.textContent=`${state.stage}주차 진행 중`;detail.textContent=state.stage===3?'3주차에서 4주차로 넘어가는 조건은 식단·지침 보기에서 확인하세요.':'측정값은 시작 기준과 최근 추세를 함께 확인하세요.'}
 }
 const baseRenderChart=renderChart;renderChart=()=>{baseRenderChart();renderOverview();renderDecision();if(!state.records.length)$('#chartSummary').textContent='측정 기록을 입력하면 변화가 표시됩니다.'};
