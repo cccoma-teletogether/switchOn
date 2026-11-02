@@ -18,7 +18,7 @@ if(!['initial','weekly','recent'].includes(state.chartRange))state.chartRange='i
 if(!state.decisionChecks||typeof state.decisionChecks!=='object')state.decisionChecks={};
 ['training','fatigue','protein'].forEach(key=>{if(!['unknown','ok','concern'].includes(state.decisionChecks[key]))state.decisionChecks[key]='unknown'});
 if(!Array.isArray(state.fastingDays))state.fastingDays=[];
-state.stage=Number(state.stage)||1;$('#currentStage').textContent=`${state.stage}주차`;$('#decisionWeekChip').textContent=`${state.stage}주차`;
+state.stage=Number(state.stage)||1;state.repeat=Number(state.repeat)||1;const startForStage=new Date(`${state.startDate}T00:00:00`),todayForStage=new Date();todayForStage.setHours(0,0,0,0);const calendarWeek=Math.max(1,Math.floor((todayForStage-startForStage)/604800000)+1);if(state.stage===1&&state.repeat===1&&calendarWeek===2){state.stage=2;persist()}$('#currentStage').textContent=`${state.stage}주차`;$('#decisionWeekChip').textContent=`${state.stage}주차`;
 const savedRecordCount=state.records.length;state.records=state.records.filter(r=>!(Number(r.weight)===0&&Number(r.muscle)===0&&Number(r.fat)===0));if(state.records.length!==savedRecordCount)persist();
 function syncFastingToggle(){const button=$('#toggleFastingDay');if(!button)return;const active=state.fastingDays.includes(fmt(state.selected));button.textContent=active?'단식일 지정 해제':'단식일로 지정';button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));}
 function fatMass(record){const percent=Number(record.fatPercent),weight=Number(record.weight);return record.fatPercent!==undefined&&Number.isFinite(percent)&&weight?Number((weight*percent/100).toFixed(1)):Number(record.fat)||0;}
@@ -105,7 +105,6 @@ function renderDecision(){
 }
 const baseRenderChart=renderChart;renderChart=()=>{baseRenderChart();renderOverview();renderDecision();if(!state.records.length)$('#chartSummary').textContent='측정 기록을 입력하면 변화가 표시됩니다.'};
 const baseRenderHistory=renderHistory;renderHistory=()=>{if(!state.records.length){$('#history').innerHTML='';return}baseRenderHistory()};
-$('#startForm').addEventListener('submit',()=>{state.records=[];state.stage=1;state.repeat=1;$('#currentStage').textContent='1주차';$('#decisionWeekChip').textContent='1주차';$('#history').innerHTML='';$('#recordsTable').innerHTML='';$('#recordCount').textContent='0건';$('#emptyRecords').style.display='block';renderOverview();},true);
 window.addEventListener('beforeunload',persist);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persist()});
 document.querySelectorAll('[data-chart-range]').forEach(button=>button.onclick=()=>{state.chartRange=button.dataset.chartRange;persist();renderChart()});$('#chartWeekSelect').onchange=()=>{state.chartWeek=$('#chartWeekSelect').value;persist();renderChart()};document.querySelectorAll('[data-decision-check]').forEach(input=>input.onchange=()=>{state.decisionChecks[input.dataset.decisionCheck]=input.value;persist();renderDecision()});
 $('#exportData').onclick=()=>{const payload={version:2,exportedAt:new Date().toISOString(),startDate:state.startDate,height:state.height,stage:state.stage,repeat:state.repeat,records:state.records,fastingDays:state.fastingDays,decisionChecks:state.decisionChecks};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`switchon-${state.startDate||'backup'}.json`;link.click();URL.revokeObjectURL(link.href)};
@@ -115,8 +114,8 @@ function openStartDate(){ $('#startDateInput').value=state.startDate;$('#startDi
 $('#setStartDate').onclick=openStartDate;
 $('#closeStart').onclick=()=>$('#startDialog').close();$('#cancelStart').onclick=()=>$('#startDialog').close();
 $('#openDietGuide').onclick=()=>{renderDietGuide(Math.min(4,Math.max(1,Number(state.stage)||1)));$('#dietGuideDialog').showModal()};$('#closeDietGuide').onclick=()=>$('#dietGuideDialog').close();document.querySelectorAll('[data-guide-week]').forEach(button=>button.onclick=()=>renderDietGuide(Number(button.dataset.guideWeek)));
-$('#startForm').onsubmit=e=>{e.preventDefault();state.startDate=$('#startDateInput').value;const d=new Date(`${state.startDate}T00:00:00`);state.selected=d;state.year=d.getFullYear();state.month=d.getMonth();persist();$('#startDialog').close();renderCalendar();renderHistory();};$('#startForm').addEventListener('submit',()=>setTimeout(renderChart,0));
-$('#startForm').addEventListener('submit',()=>{state.decisionChecks={training:'unknown',fatigue:'unknown',protein:'unknown'};persist();renderDecision()});
+$('#startForm').onsubmit=e=>{e.preventDefault();state.startDate=$('#startDateInput').value;const d=new Date(`${state.startDate}T00:00:00`);state.selected=d;state.year=d.getFullYear();state.month=d.getMonth();persist();$('#startDialog').close();renderCalendar();renderHistory();renderChart();};
+
 function persist(){localStorage.setItem(KEY,JSON.stringify({...state,selected:state.selected.toISOString()}));}
 function openRecord(){const d=state.selected;$('#recordDate').textContent=`${pretty(d)} 기록`;const rec=state.records.find(r=>r.date===fmt(d));const f=$('#recordForm');['weight','muscle','fat'].forEach(k=>f.elements[k].value=rec?.[k]||'');syncFastingToggle();$('#recordDialog').showModal();}
 $('#toggleFastingDay').onclick=()=>{const key=fmt(state.selected),ix=state.fastingDays.indexOf(key);ix<0?state.fastingDays.push(key):state.fastingDays.splice(ix,1);persist();renderCalendar();syncFastingToggle()};
