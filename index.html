@@ -54,9 +54,10 @@
     </section>
 
     <section class="panel chart-panel">
-      <div class="panel-heading chart-heading"><div><span class="label">BODY COMPOSITION</span><h2>초기 기준 대비 변화</h2></div><div class="chart-tabs"><button class="active" data-chart="muscle">근육량</button><button data-chart="fat">체지방</button><button data-chart="weight">체중</button></div></div>
+      <div class="panel-heading chart-heading"><div><span class="label">BODY COMPOSITION</span><h2 id="chartTitle">초기 기준 대비 변화</h2></div><div class="chart-tabs"><button class="active" data-chart="muscle">근육량</button><button data-chart="fat">체지방</button><button data-chart="weight">체중</button></div></div>
+      <div class="chart-range-controls" role="group" aria-label="그래프 비교 기준"><button class="active" data-chart-range="initial">초기 기준 대비</button><button data-chart-range="weekly">주차별</button><button data-chart-range="recent">최근 1주일</button><select id="chartWeekSelect" aria-label="비교할 주차" hidden></select></div>
       <div class="chart-wrap"><svg id="chart" viewBox="0 0 800 250" role="img" aria-label="신체 변화 그래프"></svg></div>
-      <div class="chart-caption"><span><i class="line-key muscle-key"></i>측정값</span><span><i class="line-key baseline-key"></i>초기 기준선</span><span><i class="line-key trend-key"></i>추세선</span><span id="chartSummary">초기 대비 근육량 -0.2kg</span></div>
+      <div class="chart-caption"><span><i class="line-key muscle-key"></i>측정값</span><span><i class="line-key baseline-key"></i><span id="chartBaselineLegend">초기 기준선</span></span><span><i class="line-key trend-key"></i>추세선</span><span id="chartSummary">초기 대비 근육량 -0.2kg</span></div>
     </section>
 
     <section class="records-section"><div class="section-title"><div><span class="label">DAILY MEASUREMENTS</span><h2>날짜별 측정 기록</h2></div><span class="record-count" id="recordCount">0건</span></div><div class="records-table-wrap"><table><thead><tr><th>날짜</th><th>체중</th><th>BMI</th><th>근육량</th><th>체지방량</th></tr></thead><tbody id="recordsTable"></tbody></table><p class="empty-records" id="emptyRecords">아직 측정 기록이 없습니다.</p></div></section>
