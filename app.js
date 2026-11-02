@@ -82,7 +82,7 @@ function renderDecision(){
   checkInputs.forEach(input=>input.value=checks[input.dataset.decisionCheck]||'unknown');
   const checkLabels={training:'근력운동 수행력 저하',fatigue:'심한 피로',protein:'단백질 섭취 부족'},concerns=Object.keys(checkLabels).filter(key=>checks[key]==='concern'),unchecked=Object.keys(checkLabels).filter(key=>checks[key]==='unknown'),allChecksOk=unchecked.length===0&&concerns.length===0;
   const checkStatus=$('#decisionCheckStatus');checkStatus.textContent=concerns.length?`주의 신호: ${concerns.map(key=>checkLabels[key]).join(', ')}`:unchecked.length?`${unchecked.length}개 항목 확인 필요 · 모두 양호하면 진행 판단에 반영됩니다.`:'3개 항목 모두 양호로 확인되었습니다.';checkStatus.style.color=concerns.length?'#bd7137':unchecked.length?'#9a6a2f':'#2d704a';
-  const rows=state.records.slice().sort((a,b)=>a.date.localeCompare(b.date)),recent=rows.slice(-3),first=recent[0],last=rows.at(-1);
+  const rows=state.records.slice().sort((a,b)=>a.date.localeCompare(b.date)),last=rows.at(-1);
   const startDate=new Date(`${state.startDate}T00:00:00`),firstWeekEnd=new Date(startDate);firstWeekEnd.setDate(firstWeekEnd.getDate()+7);
   const baseline=rows.find(record=>record.date>=fmt(startDate)&&record.date<fmt(firstWeekEnd))||rows[0];
   const percentOf=record=>record.fatPercent!==undefined&&Number.isFinite(Number(record.fatPercent))?Number(record.fatPercent):Number(record.weight)?fatMass(record)/Number(record.weight)*100:null;
@@ -90,7 +90,8 @@ function renderDecision(){
   const lastFatPercent=percentOf(last),baseFatPercent=percentOf(baseline),overallWeightDelta=Number((Number(last.weight)-Number(baseline.weight)).toFixed(1)),overallMuscleDelta=Number((Number(last.muscle)-Number(baseline.muscle)).toFixed(1)),overallFatMassDelta=Number((fatMass(last)-fatMass(baseline)).toFixed(1)),overallFatPercentDelta=Number((lastFatPercent-baseFatPercent).toFixed(1));
   const latestDate=new Date(`${last.date}T00:00:00`),recentStart=new Date(latestDate),previousStart=new Date(latestDate);recentStart.setDate(recentStart.getDate()-6);previousStart.setDate(previousStart.getDate()-13);
   const recentWeek=rows.filter(record=>record.date>=fmt(recentStart)&&record.date<=last.date),previousWeek=rows.filter(record=>record.date>=fmt(previousStart)&&record.date<fmt(recentStart));
-  const weekDelta=valueOf=>{if(recentWeek.length&&previousWeek.length)return Number((average(recentWeek,valueOf)-average(previousWeek,valueOf)).toFixed(1));if(recentWeek.length>=2)return Number((valueOf(recentWeek.at(-1))-valueOf(recentWeek[0])).toFixed(1));return null};
+  const weekComparisonLabel=previousWeek.length?`최근 7일 평균(${recentWeek.length}회) vs 직전 7일 평균(${previousWeek.length}회)`:`최근 7일 앞·뒤 구간 평균(${recentWeek.length}회)`;
+  const weekDelta=valueOf=>{if(recentWeek.length&&previousWeek.length)return Number((average(recentWeek,valueOf)-average(previousWeek,valueOf)).toFixed(1));if(recentWeek.length>=2){const splitAt=Math.ceil(recentWeek.length/2),firstHalf=recentWeek.slice(0,splitAt),secondHalf=recentWeek.slice(splitAt);return Number((average(secondHalf,valueOf)-average(firstHalf,valueOf)).toFixed(1))}return null};
   const recentWeightDelta=weekDelta(record=>Number(record.weight)),recentMuscleDelta=weekDelta(record=>Number(record.muscle)),recentFatPercentDelta=weekDelta(record=>percentOf(record));
   const weightFalling=overallWeightDelta<-.1,fatFalling=overallFatPercentDelta<0||overallFatMassDelta<0,overallMovingWell=weightFalling&&fatFalling;
   const muscleTrend=recentMuscleDelta===null?'자료 부족':recentMuscleDelta<-.5?'감소':recentMuscleDelta>.5?'상승':'안정';
@@ -100,11 +101,11 @@ function renderDecision(){
   const statusBadge=$('#statusBadge');statusBadge.textContent=concerns.length?'추가 점검 필요':stalledPattern?'반복 검토 신호':overallMovingWell&&muscleMaintained?(allChecksOk?'진행 준비':'진행 검토 가능'):'전체 추세 확인';
   const deltaText=(value,digits=1)=>`${value>0?'+':''}${value.toFixed(digits)}`;
   const updateCheck=(id,description,status,positive,iconText)=>{const row=$('#'+id),icon=row.querySelector('.check-icon'),badge=row.querySelector('b');row.querySelector('small').textContent=description;badge.textContent=status;badge.classList.toggle('ok',positive);badge.classList.toggle('wait',!positive);icon.textContent=iconText;icon.classList.toggle('done',positive);icon.classList.toggle('progress',!positive)};
-  const recentFatText=recentFatPercentDelta===null?'최근 1주 비교 자료 부족':`최근 1주 체지방률 ${deltaText(recentFatPercentDelta)}%p (${recentFatTrend})`;
+  const recentFatText=recentFatPercentDelta===null?'최근 1주 비교 자료 부족':`${weekComparisonLabel}: 체지방률 ${deltaText(recentFatPercentDelta)}%p (${recentFatTrend})`;
   updateCheck('fatDecisionCheck',`전체: ${baseFatPercent.toFixed(1)}% → ${lastFatPercent.toFixed(1)}% (${deltaText(overallFatPercentDelta)}%p), 체지방량 ${deltaText(overallFatMassDelta)}kg · ${recentFatText}`,overallFatPercentDelta<0||overallFatMassDelta<0?'전체 감소':recentFatPercentDelta===null?'자료 부족':'전체 증가',overallFatPercentDelta<0||overallFatMassDelta<0,'↓');
-  const recentMuscleText=recentMuscleDelta===null?'최근 1주 비교 자료 부족':`최근 1주 ${deltaText(recentMuscleDelta)}kg (${muscleTrend})`;
+  const recentMuscleText=recentMuscleDelta===null?'최근 1주 비교 자료 부족':`${weekComparisonLabel}: 근육량 ${deltaText(recentMuscleDelta)}kg (${muscleTrend})`;
   updateCheck('muscleDecisionCheck',`전체: ${Number(baseline.muscle).toFixed(1)} → ${Number(last.muscle).toFixed(1)}kg (${deltaText(overallMuscleDelta)}kg) · ${recentMuscleText}`,muscleTrend,muscleTrend==='상승'||muscleTrend==='안정',muscleTrend==='상승'?'↗':muscleTrend==='감소'?'↓':'~');
-  const recentWeightText=recentWeightDelta===null?'최근 1주 비교 자료 부족':`최근 1주 ${deltaText(recentWeightDelta)}kg`;
+  const recentWeightText=recentWeightDelta===null?'최근 1주 비교 자료 부족':`${weekComparisonLabel}: 체중 ${deltaText(recentWeightDelta)}kg`;
   updateCheck('weightDecisionCheck',`전체: ${Number(baseline.weight).toFixed(1)} → ${Number(last.weight).toFixed(1)}kg (${deltaText(overallWeightDelta)}kg) · ${recentWeightText}`,weightFalling?'전체 감소':'전체 유지·증가',weightFalling,'↓');
   const heading=$('.decision-result strong'),detail=$('.decision-result p');
   if(state.stage===2){
