@@ -80,7 +80,7 @@ function renderDecision(){
   if(empty){$('#statusBadge').textContent='측정 필요';return}
   const checks=state.decisionChecks,checkInputs=[...document.querySelectorAll('[data-decision-check]')];
   checkInputs.forEach(input=>input.value=checks[input.dataset.decisionCheck]||'unknown');
-  const checkLabels={training:'근력운동 수행력 저하',fatigue:'심한 피로',protein:'단백질 섭취 부족'},concerns=Object.keys(checkLabels).filter(key=>checks[key]==='concern'),unchecked=Object.keys(checkLabels).filter(key=>checks[key]==='unknown'),allChecksOk=unchecked.length===0&&concerns.length===0;
+  const checkLabels={training:'근력운동 수행력 저하',fatigue:'심한 피로',protein:'단백질 섭취 부족'},concerns=Object.keys(checkLabels).filter(key=>checks[key]==='concern'),unchecked=Object.keys(checkLabels).filter(key=>checks[key]==='unknown');
   const checkStatus=$('#decisionCheckStatus');checkStatus.textContent=concerns.length?`주의 신호: ${concerns.map(key=>checkLabels[key]).join(', ')}`:unchecked.length?`${unchecked.length}개 항목 확인 필요 · 모두 양호하면 진행 판단에 반영됩니다.`:'3개 항목 모두 양호로 확인되었습니다.';checkStatus.style.color=concerns.length?'#bd7137':unchecked.length?'#9a6a2f':'#2d704a';
   const rows=state.records.slice().sort((a,b)=>a.date.localeCompare(b.date)),last=rows.at(-1);
   const startDate=new Date(`${state.startDate}T00:00:00`),firstWeekEnd=new Date(startDate);firstWeekEnd.setDate(firstWeekEnd.getDate()+7);
@@ -100,8 +100,8 @@ function renderDecision(){
   const recentUnfavorablePattern=recentWeightDelta!==null&&recentFatMassDelta!==null&&recentFatMassDelta>=.2&&recentMuscleDelta!==null&&recentMuscleDelta<=-.5;
   const stalledPattern=recentUnfavorablePattern&&recentWeightDelta>=-.2;
   const muscleMaintained=recentMuscleDelta!==null?recentMuscleDelta>=-.5:overallMuscleDelta>=-1;
-  const baselineMuscle=Number(baseline.muscle),currentMuscle=Number(last.muscle),lowestMuscle=Number(lowestMuscleRecord.muscle),recoveryFromLow=Number((currentMuscle-lowestMuscle).toFixed(1)),nearStartingMuscle=currentMuscle>=baselineMuscle-.5,recoveredFromLow=lowestMuscle<baselineMuscle-.5&&recoveryFromLow>=.5,muscleProgressOk=nearStartingMuscle||recoveredFromLow||muscleMaintained,muscleProgressStatus=nearStartingMuscle?'시작 수준에 근접':recoveredFromLow?'저점 이후 회복':muscleTrend==='안정'?'최근 주간 유지':muscleTrend==='상승'?'최근 주간 증가':'회복 확인 필요';
-  const statusBadge=$('#statusBadge');statusBadge.textContent=concerns.length?'추가 점검 필요':stalledPattern?'반복 검토 신호':recentUnfavorablePattern&&overallMovingWell&&muscleProgressOk?'최근 1주 주의 · 전체 추세 양호':overallMovingWell&&muscleProgressOk?(allChecksOk?'진행 준비':'진행 검토 가능'):'전체 추세 확인';
+  const baselineMuscle=Number(baseline.muscle),currentMuscle=Number(last.muscle),lowestMuscle=Number(lowestMuscleRecord.muscle),recoveryFromLow=Number((currentMuscle-lowestMuscle).toFixed(1)),nearStartingMuscle=currentMuscle>=baselineMuscle-.5,recoveredFromLow=lowestMuscle<baselineMuscle-.5&&recoveryFromLow>=.5,muscleProgressOk=nearStartingMuscle||recoveredFromLow||muscleMaintained,muscleProgressStatus=nearStartingMuscle?'시작 수준에 근접':recoveredFromLow?'저점 이후 회복':muscleTrend==='안정'?'최근 주간 유지':muscleTrend==='상승'?'최근 주간 증가':recentUnfavorablePattern&&overallMovingWell?'최근 하락 · 다음 주 관찰':'회복 확인 필요';
+  const statusBadge=$('#statusBadge');statusBadge.textContent=concerns.length?'추가 점검 필요':overallMovingWell&&(muscleProgressOk||recentUnfavorablePattern)?recentUnfavorablePattern?'조건부 통과':'3주차 진행 가능':stalledPattern?'반복 검토 신호':'전체 추세 확인';
   const deltaText=(value,digits=1)=>`${value>0?'+':''}${value.toFixed(digits)}`;
   const updateCheck=(id,lines,status,positive,iconText)=>{const row=$('#'+id),icon=row.querySelector('.check-icon'),badge=row.querySelector('b');row.querySelector('small').innerHTML=lines.map(([label,value])=>`<span class="evidence-line"><span class="evidence-label">${label}</span><span class="evidence-value">${value}</span></span>`).join('');badge.textContent=status;badge.classList.toggle('ok',positive);badge.classList.toggle('wait',!positive);icon.textContent=iconText;icon.classList.toggle('done',positive);icon.classList.toggle('progress',!positive)};
   updateCheck('fatDecisionCheck',[['전체 기간',`${baseFatPercent.toFixed(1)}% → ${lastFatPercent.toFixed(1)}% · ${deltaText(overallFatPercentDelta)}%p · 체지방량 ${deltaText(overallFatMassDelta)}kg`],['최근 7일',recentFatPercentDelta===null?'비교 자료 부족':`${weekComparisonLabel} · 체지방률 ${deltaText(recentFatPercentDelta)}%p · 체지방량 ${deltaText(recentFatMassDelta)}kg (${recentFatTrend})`]],overallFatPercentDelta<0||overallFatMassDelta<0?'전체 감소':recentFatPercentDelta===null?'자료 부족':'전체 증가',overallFatPercentDelta<0||overallFatMassDelta<0,'↓');
@@ -111,17 +111,16 @@ function renderDecision(){
   let nextStepSummary='다음 측정에서 전체 추세를 확인하세요.',decisionDetail='전체 변화와 최근 7일 변화를 나눠 확인합니다.';
   if(state.stage===2){
     if(rows.length<2){heading.textContent='추세 확인에 측정 기록이 더 필요합니다';decisionDetail='시작값과 최근값을 비교할 수 있도록 측정을 더 기록해 주세요.';nextStepSummary='비슷한 시간과 조건으로 측정을 이어가세요.'}
-    else if(stalledPattern){heading.textContent='최근 체성분 변화 주의 · 반복 검토';decisionDetail='최근 정체와 체성분 악화가 함께 보여 원인 확인이 필요합니다.';nextStepSummary='운동 수행·피로·단백질과 측정 조건 확인 후 반복 여부를 검토하세요.'}
     else if(concerns.length){heading.textContent='선택한 주의 항목을 먼저 확인하세요';decisionDetail='운동 수행, 피로 또는 단백질 섭취에 주의 신호가 있습니다.';nextStepSummary='주의 항목을 점검한 뒤 다음 주차를 결정하세요.'}
-    else if(recentUnfavorablePattern&&overallMovingWell&&muscleProgressOk){heading.textContent='최근 1주 주의 · 전체 추세는 양호';decisionDetail='최근 한 주의 흔들림만으로 전체 감량 흐름을 뒤집지는 않습니다.';nextStepSummary='운동·피로·단백질 상태가 양호하면 3주차 진행 후 첫 주에 재측정하세요.'}
+    else if(overallMovingWell&&(muscleProgressOk||recentUnfavorablePattern)){heading.textContent='조건부 통과 · 3주차 진행 가능';decisionDetail=recentUnfavorablePattern?'전체 체중과 체지방은 감소 흐름이고, 근육량이 늘 때까지 기다릴 필요는 없습니다. 최근 7일의 체지방 증가·근육량 감소는 주의 신호지만, 한 주의 측정 변동만으로 2주 전체 결과를 뒤집지는 않습니다.':'전체 체중과 체지방은 감소하고 근육량은 회복 또는 유지 흐름입니다. 근육량 증가를 기다리기보다 운동 수행·피로·단백질 상태를 확인해 진행하는 쪽에 무게를 둡니다.';nextStepSummary='다음 측정도 비슷하면 3주차로 진행하세요. 근육량 감소와 체지방 증가가 이어지면 3주차 첫 주에 측정 조건·운동 수행·단백질 섭취를 집중 점검하세요.'}
+    else if(stalledPattern){heading.textContent='전체 추세 정체 · 2주차 반복 검토';decisionDetail='체중·체지방 감량이 뚜렷하지 않고 최근 체성분도 좋지 않은 방향입니다. 측정 조건과 근육량 흐름을 함께 확인하세요.';nextStepSummary='근육량이 계속 줄거나 운동 수행·피로·단백질 섭취에 문제가 있으면 원인을 조정하고 2주차 반복을 고려하세요.'}
     else if(recentUnfavorablePattern){heading.textContent='최근 1주 체성분 변화 주의';decisionDetail='최근 수치와 전체 회복 상태를 함께 확인해야 합니다.';nextStepSummary='운동 수행·피로·단백질과 시작·최저·현재 근육량을 확인하세요.'}
-    else if(overallMovingWell&&muscleProgressOk){heading.textContent=allChecksOk?'3주차 진행 준비':'3주차 진행 검토';decisionDetail='전체 체중·체지방은 감소하고 근육량은 회복 또는 유지 흐름입니다.';nextStepSummary='운동·피로·단백질 상태를 확인하고 진행하세요.'}
     else{heading.textContent='전체 추세를 더 확인하세요';decisionDetail='현재 기록만으로는 전체 감량과 근육 회복이 충분히 확인되지 않습니다.';nextStepSummary='측정 조건과 운동·피로·단백질 상태를 점검하세요.'}
   }
   detail.textContent=decisionDetail;
-  const overallPoint=`체중 ${deltaText(overallWeightDelta)}kg · 체지방률 ${deltaText(overallFatPercentDelta)}%p`;
-  const musclePoint=`시작 ${baselineMuscle.toFixed(1)}kg · 최저 ${lowestMuscle.toFixed(1)}kg · 현재 ${currentMuscle.toFixed(1)}kg · 저점 대비 +${recoveryFromLow.toFixed(1)}kg`;
-  const recentPoint=recentWeightDelta===null||recentMuscleDelta===null||recentFatMassDelta===null?'최근 7일 비교 자료 부족':`체중 ${deltaText(recentWeightDelta)}kg · 체지방량 ${deltaText(recentFatMassDelta)}kg · 근육량 ${deltaText(recentMuscleDelta)}kg`;
+  const overallPoint=`체중 ${deltaText(overallWeightDelta)}kg · 체지방률 ${deltaText(overallFatPercentDelta)}%p · 체지방량 ${deltaText(overallFatMassDelta)}kg`;
+  const musclePoint=`시작 ${baselineMuscle.toFixed(1)}kg · 현재 ${currentMuscle.toFixed(1)}kg (${deltaText(overallMuscleDelta)}kg) · 최저 ${lowestMuscle.toFixed(1)}kg · 저점 대비 +${recoveryFromLow.toFixed(1)}kg`;
+  const recentPoint=recentWeightDelta===null||recentMuscleDelta===null||recentFatMassDelta===null?'최근 7일 비교 자료 부족':`체중 ${deltaText(recentWeightDelta)}kg · 체지방량 ${deltaText(recentFatMassDelta)}kg · 근육량 ${deltaText(recentMuscleDelta)}kg${recentUnfavorablePattern&&overallMovingWell?' · 단기 주의 신호, 전체 추세 우선':''}`;
   $('#decisionPoints').innerHTML=[['전체 추세',overallPoint],['근육 회복',musclePoint],['최근 7일',recentPoint],['다음 행동',nextStepSummary]].map(([label,value])=>`<div class="decision-point"><span>${label}</span><strong>${value}</strong></div>`).join('');
 }
 const baseRenderChart=renderChart;renderChart=()=>{baseRenderChart();renderOverview();renderDecision();if(!state.records.length)$('#chartSummary').textContent='측정 기록을 입력하면 변화가 표시됩니다.'};
