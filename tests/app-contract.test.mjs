@@ -49,3 +49,15 @@ test('demo reset includes a previous program sample', () => {
   assert.match(app, /id:'demo-previous-program'/);
   assert.match(app, /programs:\[\{id:'demo-previous-program'/);
 });
+
+test('program comparison chart can be enlarged', () => {
+  assert.match(html, /id="comparisonChartDialog"/);
+  assert.match(app, /comparison-chart-expand/);
+  assert.match(app, /comparisonChartDialog/);
+});
+
+test('program comparison charts use metric tabs', () => {
+  assert.match(app, /comparison-chart-tabs/);
+  assert.match(app, /data-comparison-tab/);
+  assert.match(app, /data-comparison-chart/);
+});
