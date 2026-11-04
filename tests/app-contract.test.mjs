@@ -1,0 +1,45 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+
+const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+
+test('app.js has valid JavaScript syntax', () => {
+  execFileSync(process.execPath, ['--check', 'app.js'], { stdio: 'pipe' });
+});
+
+test('program lifecycle controls are present', () => {
+  assert.match(html, /id="newProgram"/);
+  assert.match(html, /id="undoNewProgram"/);
+  assert.match(html, /id="programSelect"/);
+  assert.match(html, /id="viewProgram"/);
+  assert.match(app, /function archiveCurrentProgram/);
+  assert.match(app, /function undoNewProgram/);
+});
+
+test('stage decisions require confirmation and support undo', () => {
+  assert.match(html, /id="undoStageDecision"/);
+  assert.match(app, /function undoStageDecision/);
+  assert.match(app, /if\(!confirm\(message\)\)return/);
+  assert.match(app, /lastStageTransition/);
+});
+
+test('maintenance and end-date rules are present', () => {
+  assert.match(app, /stage>6\?'유지기'/);
+  assert.match(app, /state\.endDate/);
+  assert.match(app, /recordGapNotice/);
+});
+
+test('weekly progress chart is present', () => {
+  assert.match(html, /id="weeklyHistoryChart"/);
+  assert.match(html, /data-weekly-metric="fatPercent"/);
+  assert.match(app, /function renderWeeklyHistoryChart/);
+});
+
+test('body-fat percentage and reference mass remain distinct', () => {
+  assert.match(app, /function fatPercent/);
+  assert.match(app, /function fatReference/);
+  assert.match(html, /name="fatReference"/);
+});

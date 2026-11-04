@@ -1,0 +1,7 @@
+{
+  "name": "switchon-diet-manager",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}
