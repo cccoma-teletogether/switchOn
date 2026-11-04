@@ -49,6 +49,12 @@ test('BMI chart metric is available', () => {
   assert.match(app, /weeklyHistoryMetric!=='bmi'/);
 });
 
+test('first week history is split into two phases', () => {
+  assert.match(app, /1주차 1단계/);
+  assert.match(app, /1주차 2단계/);
+  assert.match(app, /splitFirstWeek/);
+});
+
 test('body-fat percentage and reference mass remain distinct', () => {
   assert.match(app, /function fatPercent/);
   assert.match(app, /function fatReference/);
