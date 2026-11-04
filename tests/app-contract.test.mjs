@@ -38,6 +38,7 @@ test('weekly progress chart is present', () => {
   assert.match(app, /function renderWeeklyHistoryChart/);
   assert.match(app, /1주차 1단계/);
   assert.match(app, /1주차 2단계/);
+  assert.match(app, /data-trend-line/);
 });
 
 test('body-fat percentage and reference mass remain distinct', () => {
