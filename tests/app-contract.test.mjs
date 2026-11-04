@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 
 const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const style = await readFile(new URL('../style.css', import.meta.url), 'utf8');
 
 test('app.js has valid JavaScript syntax', () => {
   execFileSync(process.execPath, ['--check', 'app.js'], { stdio: 'pipe' });
@@ -89,4 +90,17 @@ test('two programs can be selected for comparison', () => {
   assert.match(app, /programPairComparison/);
   assert.match(app, /demoOlderRecords/);
   assert.match(app, /id:'demo-older-program'/);
+});
+
+test('diet guide uses a structured table instead of an image', () => {
+  assert.match(app, /class="diet-table-wrap"/);
+  assert.match(app, /class="diet-table"/);
+  assert.match(app, /주차별 간단 식단표/);
+  assert.doesNotMatch(app, /diet-table-image/);
+});
+
+test('diet guide highlights the selected week', () => {
+  assert.match(app, /week===1\?'active':''/);
+  assert.match(app, /week===4\?'active':''/);
+  assert.match(style, /diet-table tbody tr\.active/);
 });
