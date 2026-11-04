@@ -36,6 +36,8 @@ test('weekly progress chart is present', () => {
   assert.match(html, /id="weeklyHistoryChart"/);
   assert.match(html, /data-weekly-metric="fatPercent"/);
   assert.match(app, /function renderWeeklyHistoryChart/);
+  assert.match(app, /1주차 1단계/);
+  assert.match(app, /1주차 2단계/);
 });
 
 test('body-fat percentage and reference mass remain distinct', () => {
