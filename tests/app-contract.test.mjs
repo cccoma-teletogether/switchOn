@@ -61,3 +61,12 @@ test('program comparison charts use metric tabs', () => {
   assert.match(app, /data-comparison-tab/);
   assert.match(app, /data-comparison-chart/);
 });
+
+test('two programs can be selected for comparison', () => {
+  assert.match(html, /id="comparePrograms"/);
+  assert.match(html, /id="programPairA"/);
+  assert.match(html, /id="programPairB"/);
+  assert.match(app, /programPairComparison/);
+  assert.match(app, /demoOlderRecords/);
+  assert.match(app, /id:'demo-older-program'/);
+});
