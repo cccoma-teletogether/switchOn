@@ -43,3 +43,9 @@ test('body-fat percentage and reference mass remain distinct', () => {
   assert.match(app, /function fatReference/);
   assert.match(html, /name="fatReference"/);
 });
+
+test('demo reset includes a previous program sample', () => {
+  assert.match(app, /demoPreviousRecords/);
+  assert.match(app, /id:'demo-previous-program'/);
+  assert.match(app, /programs:\[\{id:'demo-previous-program'/);
+});
