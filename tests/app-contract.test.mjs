@@ -52,6 +52,7 @@ test('demo reset includes a previous program sample', () => {
   assert.match(app, /function fillDemoDailyRecords/);
   assert.match(app, /id:'demo-previous-program'/);
   assert.match(app, /programs:\[\{id:'demo-previous-program'/);
+  assert.match(app, /state\.demoVersion===2/);
 });
 
 test('program comparison chart can be enlarged', () => {
