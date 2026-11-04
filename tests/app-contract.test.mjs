@@ -41,6 +41,14 @@ test('weekly progress chart is present', () => {
   assert.match(app, /data-trend-line/);
 });
 
+test('BMI chart metric is available', () => {
+  assert.match(html, /data-chart="bmi"/);
+  assert.match(app, /function bmiValue/);
+  assert.match(app, /key==='bmi'/);
+  assert.match(html, /data-weekly-metric="bmi"/);
+  assert.match(app, /weeklyHistoryMetric!=='bmi'/);
+});
+
 test('body-fat percentage and reference mass remain distinct', () => {
   assert.match(app, /function fatPercent/);
   assert.match(app, /function fatReference/);
