@@ -56,6 +56,7 @@
 .maintenance-guide .guide-table td{text-align:left}
 .maintenance-guide .guide-table tbody th{width:28%;padding-left:2px;padding-right:2px;white-space:nowrap;word-break:keep-all}
 .maintenance-guide .guide-table th:first-child,.maintenance-guide .guide-table td:first-child{width:28%;padding-left:2px;padding-right:2px}.maintenance-guide .guide-table th:nth-child(2),.maintenance-guide .guide-table td:nth-child(2){width:36%}.maintenance-guide .guide-table th:nth-child(3),.maintenance-guide .guide-table td:nth-child(3){width:36%}
+.maintenance-extension-guide{border-color:#e7d8bd;background:#fffdf8}.maintenance-extension-guide h3{color:#765c2b}.maintenance-extension-guide h4{margin:14px 0 5px;color:#6b5a3b;font-size:12px}.maintenance-extension-guide li{margin-bottom:3px}
 .food-guide-table th:first-child,.food-guide-table td:first-child{width:18%;text-align:center}.food-guide-table th:nth-child(2),.food-guide-table td:nth-child(2){width:42%;text-align:left}.food-guide-table th:nth-child(3),.food-guide-table td:nth-child(3){width:40%;text-align:left}.food-guide-table small{font-size:9px;color:#819088}
 .food-guide-table thead th:nth-child(2),.food-guide-table thead th:nth-child(3){text-align:center}
 .guide-tabs{grid-template-columns:repeat(5,1fr)}

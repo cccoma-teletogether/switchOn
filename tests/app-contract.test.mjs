@@ -205,3 +205,15 @@ test('weekly food rules category column is reduced independently', () => {
 test('weekly food rule detail cells are left aligned', () => {
   assert.match(style, /food-rules-guide \.guide-table td:nth-child\(2\),.food-rules-guide \.guide-table td:nth-child\(3\)\{text-align:left\}/);
 });
+
+test('normal progression enters maintenance after week four', () => {
+  assert.match(app, /nextProgressionStage=stage=>stage===4\?7:stage\+1/);
+  assert.match(app, /const nextStage=nextProgressionStage\(state\.stage\)/);
+});
+
+test('maintenance guide explains week four extension criteria', () => {
+  assert.match(app, /4주차 종료 후 반복 판단/);
+  assert.match(app, /4주차 반복·연장을 고려할 수 있는 경우/);
+  assert.match(app, /유지기 또는 상담을 우선할 경우/);
+  assert.match(app, /baseRenderDietGuideWithExtension/);
+});
