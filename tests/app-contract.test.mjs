@@ -104,3 +104,104 @@ test('diet guide highlights the selected week', () => {
   assert.match(app, /week===4\?'active':''/);
   assert.match(style, /diet-table tbody tr\.active/);
 });
+
+test('app provides a blank initialization flow and clears demo data on new start', () => {
+  assert.match(html, /id="clearData"/);
+  assert.match(app, /localStorage\.removeItem\(KEY\)/);
+  assert.match(app, /state\.programId!==\'demo-program\'/);
+  assert.match(app, /state\.programs=\[\]/);
+});
+
+test('archived programs can be viewed in the full dashboard read-only', () => {
+  assert.match(html, /id="programViewBanner"/);
+  assert.match(html, /id="returnCurrentProgram"/);
+  assert.match(app, /function enterArchivedProgramView/);
+  assert.match(app, /function leaveArchivedProgramView/);
+  assert.match(app, /state\.viewOnly/);
+});
+
+test('demo muscle trend drops in week one before recovering', () => {
+  assert.match(app, /2026-10-26'.*muscle:27\.5.*2026-11-02'.*muscle:27\.1.*2026-11-09'.*muscle:27\.8/);
+  assert.match(app, /state\.demoVersion===4/);
+});
+
+test('diet guide includes failure patterns and recovery tips', () => {
+  assert.match(app, /주차별 주요 실패 패턴/);
+  assert.match(app, /주의해야 할 실패 케이스와 원인/);
+  assert.match(app, /실패 시 재도전 및 관리 팁/);
+  assert.match(app, /baseRenderDietGuideWithFailures/);
+});
+
+test('diet guide includes weekly food rules', () => {
+  assert.match(app, /주차별 허용 식품과 금지 식품/);
+  assert.match(app, /1주차 허용 식품과 금지 식품/);
+  assert.match(app, /2주차 허용 식품과 추가 규칙/);
+  assert.match(app, /3주차와 4주차 식품 확장 및 안정화/);
+  assert.match(app, /baseRenderDietGuideWithFoodRules/);
+});
+
+test('diet guide includes maintenance guidance', () => {
+  assert.match(app, /유지기 관리지침/);
+  assert.match(app, /유지기 핵심 관리 원칙/);
+  assert.match(app, /단식과 운동 전략/);
+  assert.match(app, /수면과 생활 습관/);
+  assert.match(app, /baseRenderDietGuideWithMaintenance/);
+});
+
+test('maintenance guidance has a separate guide tab', () => {
+  assert.match(app, /data-guide-week="maintenance"/);
+  assert.match(app, /renderDietGuide\('maintenance'\)/);
+  assert.match(style, /grid-template-columns:repeat\(5,1fr\)/);
+});
+
+test('maintenance table detail cells are left aligned', () => {
+  assert.match(style, /maintenance-guide \.guide-table td\{text-align:left\}/);
+});
+
+test('maintenance table keeps the management column compact', () => {
+  assert.match(style, /maintenance-guide \.guide-table tbody th\{width:28%;padding-left:2px;padding-right:2px/);
+});
+
+test('maintenance table overrides global column widths', () => {
+  assert.match(style, /maintenance-guide \.guide-table th:first-child,.maintenance-guide \.guide-table td:first-child\{width:28%/);
+  assert.match(style, /maintenance-guide \.guide-table th:nth-child\(2\).*width:36%/);
+});
+
+test('allowed food guide uses a compact table instead of an image', () => {
+  assert.match(app, /food-guide-table/);
+  assert.match(app, /허용 식품 가이드/);
+  assert.match(app, /공통 금지/);
+  assert.match(app, /baseRenderDietGuideWithFoodTable/);
+});
+
+test('allowed food guide keeps the common food list', () => {
+  assert.match(app, /기본 허용/);
+  assert.match(app, /물 하루 8컵 이상/);
+  assert.match(app, /두부·연두부/);
+});
+
+test('allowed food guide headers are centered', () => {
+  assert.match(style, /food-guide-table thead th:nth-child\(2\),.food-guide-table thead th:nth-child\(3\)\{text-align:center\}/);
+});
+
+test('failure pattern table detail cells are left aligned', () => {
+  assert.match(style, /failure-guide \.guide-table td\{text-align:left\}/);
+});
+
+test('failure pattern category column is compact', () => {
+  assert.match(style, /failure-guide \.guide-table th:first-child,.failure-guide \.guide-table td:first-child\{width:15%/);
+});
+
+test('caution failure table has an independent category width', () => {
+  assert.match(app, /caution-failure-guide/);
+  assert.match(style, /caution-failure-guide \.guide-table th:first-child,.caution-failure-guide \.guide-table td:first-child\{width:25%/);
+});
+
+test('weekly food rules category column is reduced independently', () => {
+  assert.match(style, /food-rules-guide \.guide-table th:first-child,.food-rules-guide \.guide-table td:first-child\{width:16%/);
+  assert.match(style, /food-rules-guide \.guide-table th:nth-child\(2\).*width:42%/);
+});
+
+test('weekly food rule detail cells are left aligned', () => {
+  assert.match(style, /food-rules-guide \.guide-table td:nth-child\(2\),.food-rules-guide \.guide-table td:nth-child\(3\)\{text-align:left\}/);
+});
