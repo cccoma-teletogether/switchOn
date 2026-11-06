@@ -217,3 +217,32 @@ test('maintenance guide explains week four extension criteria', () => {
   assert.match(app, /유지기 또는 상담을 우선할 경우/);
   assert.match(app, /baseRenderDietGuideWithExtension/);
 });
+
+test('diet guide includes real-world failure patterns', () => {
+  assert.match(app, /실제 사례에서 반복된 실패 유형/);
+  assert.match(app, /프로그램 미준수와 치팅데이 확대/);
+  assert.match(app, /주말과 사회적 상황에서의 간식 유혹/);
+  assert.match(app, /운동 부족·정체기·생활 환경 요인/);
+  assert.match(app, /baseRenderDietGuideWithLivedFailures/);
+});
+
+test('diet guide includes snack alternatives and cautions', () => {
+  assert.match(app, /허기 보완용 보조 간식 가이드/);
+  assert.match(app, /곤약 젤리/);
+  assert.match(app, /무가당 그릭 요거트/);
+  assert.match(app, /낫또 간식/);
+  assert.match(app, /baseRenderDietGuideWithSnackGuide/);
+});
+
+test('diet guide includes extended failure and restart strategies', () => {
+  assert.match(app, /주요 실패 유형 및 원인 분석/);
+  assert.match(app, /유지기 관리 원칙과 재시작 전략/);
+  assert.match(app, /최소 3~4주 유지 후 검토/);
+  assert.match(app, /baseRenderDietGuideWithRestart/);
+});
+
+test('diet guide supports a mobile full-screen view', () => {
+  assert.match(app, /guide-fullscreen-toggle/);
+  assert.match(app, /guide-fullscreen/);
+  assert.match(style, /\.guide-fullscreen\{width:100vw/);
+});
