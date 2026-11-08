@@ -112,6 +112,13 @@ test('app provides a blank initialization flow and clears demo data on new start
   assert.match(app, /state\.programs=\[\]/);
 });
 
+test('calendar selection resets to today when the app opens or returns to the foreground', () => {
+  assert.match(app, /function syncTodaySelection/);
+  assert.match(app, /state\.selected=today/);
+  assert.match(app, /window\.addEventListener\('pageshow'/);
+  assert.match(app, /visibilitychange/);
+});
+
 test('archived programs can be viewed in the full dashboard read-only', () => {
   assert.match(html, /id="programViewBanner"/);
   assert.match(html, /id="returnCurrentProgram"/);

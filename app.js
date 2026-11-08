@@ -22,6 +22,15 @@ const weeklyGuides={
   4:{title:'4주차 · 안정기',summary:'3주차 근육량이 다이어트 이전 수준으로 회복됐는지에 따라 단식 횟수를 정합니다.',fasting:'프로그램 인터뷰 기준: 미회복 주 2회 · 회복 또는 증가 주 3회 (24시간)',shakes:'식사일 하루 2회 · 아침과 오후',progression:'참고 이미지의 진행 판단은 1주차 근육량과 비교하고, 프로그램 인터뷰의 4주차 단식 횟수는 다이어트 전 초기 근육량 회복 여부와 비교합니다. 서로 다른 비교 기준이므로 구분해 확인하세요.',allowedDetails:['앞 주차까지 추가된 허용 식품을 이어갑니다. 참고 이미지에는 4주차 신규 허용 식품이 따로 나와 있지 않습니다.'],fastingDetails:['저녁 식사 후 24시간 공복을 유지합니다. 예: 저녁 7시에 식사를 마치면 다음 날 저녁 7시까지 단식합니다.','단식일 사이에 일반 식사일을 두고 연속 단식은 피합니다. 단식 중 물과 허브티를 마실 수 있고, 이미지 안내에는 블랙커피 하루 1잔까지 허용되어 있습니다.','단식이 끝난 뒤에는 고단백 식사를 충분히 챙깁니다.'],meals:['식사일에는 끼니를 충분히 챙기고, 단백질·채소 중심의 식사 습관을 이어갑니다.']}
 };
 const $=s=>document.querySelector(s); const fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; const pretty=d=>`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+const todayDate=()=>{const today=new Date();today.setHours(0,0,0,0);return today};
+function syncTodaySelection(render=false){
+  if(state.viewOnly)return false;
+  const today=todayDate(),changed=!(state.selected instanceof Date)||Number.isNaN(state.selected.getTime())||fmt(state.selected)!==fmt(today)||state.year!==today.getFullYear()||state.month!==today.getMonth();
+  if(!changed)return false;
+  state.selected=today;state.year=today.getFullYear();state.month=today.getMonth();persist();
+  if(render&&typeof renderCalendar==='function')renderCalendar();
+  return true;
+}
 const savedAppData=localStorage.getItem(KEY);try{Object.assign(state,JSON.parse(savedAppData||'{}'));if(typeof state.selected==='string')state.selected=new Date(state.selected);}catch{}
 if(!savedAppData){const today=new Date();today.setHours(0,0,0,0);state.startDate=fmt(today);state.selected=today;state.year=today.getFullYear();state.month=today.getMonth();state.stage=1;state.repeat=1;state.endDate='';state.records=[]}
 if(!state.startDate)state.startDate='2026-10-26';
@@ -32,6 +41,7 @@ if(!['initial','weekly','recent'].includes(state.chartRange))state.chartRange='i
 if(!state.decisionChecks||typeof state.decisionChecks!=='object')state.decisionChecks={};
 ['training','fatigue','protein'].forEach(key=>{if(!['unknown','ok','concern'].includes(state.decisionChecks[key]))state.decisionChecks[key]='unknown'});
 if(!Array.isArray(state.fastingDays))state.fastingDays=[];
+syncTodaySelection();
 state.stage=Number(state.stage)||1;state.repeat=Number(state.repeat)||1;const startForStage=new Date(`${state.startDate}T00:00:00`),todayForStage=new Date();todayForStage.setHours(0,0,0,0);const calendarWeek=Math.max(1,Math.floor((todayForStage-startForStage)/604800000)+1);if(state.stage===1&&state.repeat===1&&calendarWeek===2){state.stage=2;persist()}
 const stageLabel=stage=>stage>6?'유지기':`${stage}주차`;const nextProgressionStage=stage=>stage===4?7:stage+1;
 const signedDelta=value=>`${value>0?'+':''}${Number(value).toFixed(1)}`;
@@ -198,6 +208,8 @@ function openGuideImage(image){imageZoom=1;imageViewerImage.alt=image.alt;imageV
 $('#guideBody').addEventListener('click',event=>{const image=event.target.closest('.guide-reference-image');if(image)openGuideImage(image)});$('#closeImageViewer').onclick=()=>imageViewer.close();$('#zoomIn').onclick=()=>{imageZoom=Math.min(4,imageZoom*1.25);updateImageViewer()};$('#zoomOut').onclick=()=>{imageZoom=Math.max(.5,imageZoom/1.25);updateImageViewer()};$('#zoomReset').onclick=()=>{imageZoom=1;updateImageViewer()};imageViewer.addEventListener('click',event=>{if(event.target===imageViewer)imageViewer.close()});imageViewer.addEventListener('close',()=>{imageViewerImage.removeAttribute('src');imageViewerImage.alt=''});window.addEventListener('resize',()=>{if(imageViewer.open)updateImageViewer()});
 const touchGap=touches=>Math.hypot(touches[0].clientX-touches[1].clientX,touches[0].clientY-touches[1].clientY);imageViewerStage.addEventListener('touchstart',event=>{if(event.touches.length===2){pinchDistance=touchGap(event.touches);pinchZoom=imageZoom;event.preventDefault()}},{passive:false});imageViewerStage.addEventListener('touchmove',event=>{if(event.touches.length===2&&pinchDistance){imageZoom=Math.max(.5,Math.min(4,pinchZoom*touchGap(event.touches)/pinchDistance));updateImageViewer(false);event.preventDefault()}},{passive:false});imageViewerStage.addEventListener('touchend',event=>{if(event.touches.length<2)pinchDistance=0});
 function persist(){localStorage.setItem(KEY,JSON.stringify({...state,selected:state.selected.toISOString()}));}
+window.addEventListener('pageshow',()=>syncTodaySelection(true));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncTodaySelection(true)});
 function openRecord(){const d=state.selected;if(state.endDate&&fmt(d)>state.endDate){alert(`프로그램 종료일(${state.endDate.replaceAll('-','.')}) 이후에는 측정 기록을 추가할 수 없습니다.`);return}$('#recordDate').textContent=`${pretty(d)} 기록`;const rec=state.records.find(r=>r.date===fmt(d));const f=$('#recordForm');['weight','muscle','fat'].forEach(k=>f.elements[k].value=rec?.[k]||'');syncFastingToggle();$('#recordDialog').showModal();}
 $('#toggleFastingDay').onclick=()=>{const key=fmt(state.selected),ix=state.fastingDays.indexOf(key);ix<0?state.fastingDays.push(key):state.fastingDays.splice(ix,1);persist();renderCalendar();syncFastingToggle()};
 document.querySelectorAll('#recordForm button[value="cancel"]').forEach(button=>{button.type='button';button.formNoValidate=true;button.onclick=e=>{e.preventDefault();$('#recordDialog').close()}});
