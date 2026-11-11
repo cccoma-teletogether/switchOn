@@ -43,7 +43,7 @@ if(!state.decisionChecks||typeof state.decisionChecks!=='object')state.decisionC
 ['training','fatigue','protein','balance'].forEach(key=>{if(!['unknown','ok','concern'].includes(state.decisionChecks[key]))state.decisionChecks[key]='unknown'});
 if(!Array.isArray(state.fastingDays))state.fastingDays=[];
 syncTodaySelection();
-const savedTheme=localStorage.getItem(`${KEY}-theme`),initialTheme=savedTheme||((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.body.classList.toggle('theme-dark',initialTheme==='dark');
+const savedTheme=localStorage.getItem(`${KEY}-theme`),initialTheme=savedTheme||'light';document.body.classList.toggle('theme-dark',initialTheme==='dark');
 state.stage=Number(state.stage)||1;state.repeat=Number(state.repeat)||1;const startForStage=new Date(`${state.startDate}T00:00:00`),todayForStage=new Date();todayForStage.setHours(0,0,0,0);const calendarWeek=Math.max(1,Math.floor((todayForStage-startForStage)/604800000)+1);if(state.stage===1&&state.repeat===1&&calendarWeek===2){state.stage=2;persist()}
 const stageLabel=stage=>stage>6?'유지기':`${stage}주차`;const nextProgressionStage=stage=>stage===4?7:stage+1;
 const signedDelta=value=>`${value>0?'+':''}${Number(value).toFixed(1)}`;
