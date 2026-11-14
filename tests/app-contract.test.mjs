@@ -63,6 +63,17 @@ test('body-fat percentage and reference mass remain distinct', () => {
   assert.match(app, /Number\(last\.muscle\)-getMuscleBaseline/);
 });
 
+test('BIA raw and adjusted values are preserved and require approval', () => {
+  assert.match(app, /function processBiaRecords/);
+  assert.match(app, /weightRaw/);
+  assert.match(app, /muscleAdj/);
+  assert.match(app, /fatMassAdj/);
+  assert.match(app, /biaStatus/);
+  assert.match(app, /data-bia-date/);
+  assert.match(app, /biaAdjustmentApproved/);
+  assert.match(html, /보정 적용/);
+});
+
 test('demo reset includes a previous program sample', () => {
   assert.match(app, /demoPreviousRecords/);
   assert.match(app, /function fillDemoDailyRecords/);
@@ -252,4 +263,13 @@ test('diet guide supports a mobile full-screen view', () => {
   assert.match(app, /guide-fullscreen-toggle/);
   assert.match(app, /guide-fullscreen/);
   assert.match(style, /\.guide-fullscreen\{width:100vw/);
+});
+
+test('graphs and measurement table support full-screen viewing', () => {
+  assert.match(html, /data-fullscreen-target="mainChartWrap"/);
+  assert.match(html, /data-fullscreen-target="weeklyChartWrap"/);
+  assert.match(html, /data-fullscreen-target="recordsTableWrap"/);
+  assert.match(html, /id="fullscreenViewer"/);
+  assert.match(app, /fullscreenViewerBody/);
+  assert.match(style, /\.fullscreen-viewer/);
 });
