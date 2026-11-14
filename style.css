@@ -89,3 +89,5 @@ body.theme-dark{--ink:#edf4ef;--muted:#a6b2aa;--line:#3b443e;--paper:#141615;--c
 .calendar .day.today{outline:1px solid #2d9b5a!important;box-shadow:none!important}.theme-dark .calendar .day.today{outline:1px solid #8dffb0!important;box-shadow:none!important}
 .approved-key{border-top:2px dotted #9333ea}.chart-caption{flex-wrap:wrap}.chart-caption>span{white-space:nowrap}
 .chart-caption>span[hidden]{display:none!important}
+.bia-input-review{margin-top:6px;white-space:normal;min-width:130px;font-size:11px;color:var(--ink)}.bia-input-review summary{cursor:pointer;color:var(--orange);font-weight:700}.bia-input-review p{max-width:260px;line-height:1.6;margin:6px 0;text-align:left;overflow-wrap:anywhere}
+.chart-tabs,.weekly-chart-tabs{flex-wrap:wrap}
