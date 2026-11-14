@@ -69,9 +69,12 @@ test('BIA raw and adjusted values are preserved and require approval', () => {
   assert.match(app, /muscleAdj/);
   assert.match(app, /fatMassAdj/);
   assert.match(app, /biaStatus/);
+  assert.match(app, /function boneMass/);
+  assert.match(app, /function compositionError/);
   assert.match(app, /data-bia-date/);
   assert.match(app, /biaAdjustmentApproved/);
   assert.match(html, /보정 적용/);
+  assert.match(html, /name="bone"/);
 });
 
 test('demo reset includes a previous program sample', () => {
@@ -272,4 +275,13 @@ test('graphs and measurement table support full-screen viewing', () => {
   assert.match(html, /id="fullscreenViewer"/);
   assert.match(app, /fullscreenViewerBody/);
   assert.match(style, /\.fullscreen-viewer/);
+});
+
+test('raw and adjusted values are overlaid in one chart', () => {
+  assert.match(html, /id="chart"/);
+  assert.doesNotMatch(html, /id="adjustedChart"/);
+  assert.match(html, /원본 측정값/);
+  assert.match(html, /보정값 적용/);
+  assert.match(app, /renderMetricSvg/);
+  assert.match(app, /secondaryPts/);
 });
