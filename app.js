@@ -86,7 +86,7 @@ function processBiaRecords(records){
     row.muscleAdjustmentApproved=Boolean(row.muscleAdjustmentApproved);row.fatAdjustmentApproved=Boolean(row.fatAdjustmentApproved);
     if(error!==null&&error>.3)reasons.push(`원본 구성 오차 ${error.toFixed(1)}kg`);
     if(previous){const days=Math.max(1,(new Date(row.date)-new Date(previous.date))/86400000);row.biaDailyMuscleChange=(muscle-rawMuscle(previous))/days;row.biaDailyFatChange=(fat-rawFat(previous))/days;
-      for(const [key,label] of [['water','수분'],['protein','단백질']])if(row[key]!=null&&previous[key]!=null&&Math.abs(Number(row[key])-Number(previous[key]))>1)reasons.push(`${label} 비율 변화 ${(Number(row[key])-Number(previous[key])).toFixed(1)}%p · 측정 조건 확인`);
+      for(const [key,label] of [['water','수분'],['protein','단백질']])if(row[key]!=null){const expected=metricTrendEstimate(row,key,ordered,r=>r[key]==null?NaN:Number(r[key]));if(Math.abs(expected-Number(row[key]))>.05)reasons.push(`${label} 비율 추세 이탈 · 입력 ${Number(row[key]).toFixed(1)}%, 추세 예상 ${expected.toFixed(1)}% · 측정 조건 확인`)}
     }
     if(error!==null&&error>.3&&previous&&next){
       const gap=(new Date(next.date)-new Date(previous.date))/86400000;
@@ -114,7 +114,7 @@ function processBiaRecords(records){
       }
     }
     const changed=Math.abs(row.muscleAdj-muscle)>.05||Math.abs(row.fatMassAdj-fat)>.05;
-    row.biaInputReview=changed||(error!==null&&error>.3)||reasons.some(reason=>reason.includes('비율 변화')||reason.includes('일시 급변'));
+    row.biaInputReview=changed||(error!==null&&error>.3)||reasons.some(reason=>reason.includes('비율 추세 이탈')||reason.includes('일시 급변'));
     if(row.biaInputReview)reasons.push('입력 오타 또는 측정 조건 차이 가능 · 보정 적용 전 원본 기기의 체중·근육량·체지방률·수분·단백질을 확인하세요. 오타라면 원본 기록을 수정하세요.');
     if(error!==null&&error>.3&&!changed)reasons.push('보정 근거 부족 · 원본 유지 및 재측정 확인');
     row.biaRawCompositionError=error;row.biaAdjustedCompositionError=residual(row,row.muscleAdj,row.fatMassAdj);
