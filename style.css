@@ -91,3 +91,5 @@ body.theme-dark{--ink:#edf4ef;--muted:#a6b2aa;--line:#3b443e;--paper:#141615;--c
 .chart-caption>span[hidden]{display:none!important}
 .bia-input-review{margin-top:6px;white-space:normal;min-width:130px;font-size:11px;color:var(--ink)}.bia-input-review summary{cursor:pointer;color:var(--orange);font-weight:700}.bia-input-review p{max-width:260px;line-height:1.6;margin:6px 0;text-align:left;overflow-wrap:anywhere}
 .chart-tabs,.weekly-chart-tabs{flex-wrap:wrap}
+.record-form-grid{grid-template-areas:"weight fat-percent" "water fat-mass" "bone muscle" "protein ." "condition condition"}
+.record-quality-check:not(:empty){padding:10px 12px;margin-top:12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font-size:12px;line-height:1.6}.record-quality-check p{margin:4px 0}
