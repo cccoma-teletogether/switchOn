@@ -25,7 +25,7 @@
       const response = await fetch('changelog.md', {cache: 'no-store'});
       if (!response.ok) throw new Error('load');
       const markdown = await response.text();
-      const entries = markdown.split(/\r?\n/).filter(line => /^\| TASK-/.test(line)).map(line => line.split('|').slice(1, -1).map(cell => cell.trim().replaceAll('`', '')));
+      const entries = markdown.split(/\r?\n/).filter(line => /^\|\s*TASK-\d{8}-\d+\s*\|/.test(line)).map(line => line.split('|').slice(1, -1).map(cell => cell.trim().replaceAll('`', ''))).filter(cells => cells.length >= 4 && cells[2]);
       if (!entries.length) throw new Error('empty');
       content.replaceChildren();
       entries.sort((a, b) => b[0].localeCompare(a[0]));
